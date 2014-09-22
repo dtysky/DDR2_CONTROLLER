@@ -53,7 +53,7 @@ port
 	);
 end component;
 
-component DDR2_M is
+component DDR2 is
 port
 	(
 		ck:in std_logic;
@@ -79,7 +79,7 @@ signal ddr_clk,ddr_clk_n:std_logic;
 signal cke,n_cs,n_ras,n_cas,n_we:std_logic;
 signal dm:std_logic_vector(1 downto 0);
 signal dqs,dqs_in,dqs_out:std_logic_vector(1 downto 0);
-signal dqs_en:std_logic_vector;
+signal dqs_en:std_logic;
 signal odt:std_logic;
 signal bank:std_logic_vector(2 downto 0);
 signal addr:std_logic_vector(12 downto 0);
@@ -95,12 +95,12 @@ signal ot_data_in,ot_data_out:std_logic_vector(15 downto 0);
 signal ot_bank:std_logic_vector(2 downto 0);
 signal ot_addr_row:std_logic_vector(12 downto 0);
 signal ot_addr_col:std_logic_vector(9 downto 0);
+signal dqs_n,rdqs_n:std_logic_vector(1 downto 0);
 
-constant clk_period:time:=6 ns; 
-constant clk_period2:time:=3 ns;  
+constant clk_period:time:=6000 ps; 
+constant clk_period2:time:=3000 ps;  
 signal clk_self:std_logic;
 signal ddr2_data_sim:std_logic_vector(15 downto 0);
-signal ddr2_data_text:line 
 
 
 begin
@@ -110,7 +110,7 @@ DDR2C:DDR2_CONTROL
 	port map
 		(
 			pll_lock=>pll_lock,
-			clk_control_p=>clk_c_0,clk_control_n=>clk_c_90,clk_control_90=>clk_c_180,clk_control_270=>clk_c_270,
+			clk_control_p=>clk_c_0,clk_control_n=>clk_c_180,clk_control_90=>clk_c_90,clk_control_270=>clk_c_270,
 			clk_data_p=>clk_d_0,
 			clk=>ddr_clk,n_clk=>ddr_clk_n,
 			cke=>cke,n_cs=>n_cs,n_ras=>n_ras,n_cas=>n_cas,n_we=>n_we,
@@ -140,7 +140,7 @@ DDR2C:DDR2_CONTROL
 			data_other_out=>ot_data_out
 		);
 
-DDR2M:DDR2_M
+DDR2M:DDR2
 	port map
 		(
 			ck=>ddr_clk,
@@ -155,59 +155,59 @@ DDR2M:DDR2_M
 			addr=>addr,
 			dq=>data,
 			dqs=>dqs,
+			dqs_n=>dqs_n,
+			rdqs_n=>rdqs_n,
 			odt=>odt
 		);
 
 clk_0:process
 begin	
-	dclk_0<='1';
-	
+	clk_c_0<='1';
 	wait for clk_period/2;
-	dclk_0<='0';
+	clk_c_0<='0';
 	wait for clk_period/2;
 end process;
 
 clk_180:process
 begin	
-	dclk_180<='0';
+	clk_c_180<='0';
 	wait for clk_period/2;
-	dclk_180<='1';
+	clk_c_180<='1';
 	wait for clk_period/2;
 end process;
 
 clk_90:process
 begin	
-	dclk_90<='1';
 	wait for clk_period/4;
-	dclk_90<='0';
+	clk_c_90<='0';
 	wait for clk_period/2;
-	dclk_90<='1';
+	clk_c_90<='1';
+	wait for clk_period/4;
 end process;
 
 clk_270:process
 begin	
-	dclk_270<='0';
 	wait for clk_period/4;
-	dclk_270<='1';
+	clk_c_270<='1';
 	wait for clk_period/2;
-	dclk_270<='0';
+	clk_c_270<='0';
+	wait for clk_period/4;
 end process;
 
 clk_data_0:process
 begin	
 	clk_self<='1';
-	ddclk_0<='1';
+	clk_d_0<='1';
 	wait for clk_period2/2;
 	clk_self<='0';
-	ddclk_0<='0';
+	clk_d_0<='0';
 	wait for clk_period2/2;
 end process;
 
 pll_lock<='1';
 
-process(clk_self)
+process
 
-variable con:integer range 0 to 3:=0;
 file ddr2_data_text:text;
 variable fst:FILE_OPEN_STATUS; 
 variable ddr2_data_line:line; 
@@ -216,28 +216,36 @@ begin
 
 	file_open(fst ,ddr2_data_text ,"textfile.txt",read_mode);
 
-	wait for 500 us;
-		
-	write_num<=x"0200";
-	bank<="000";
-	addr_col<="0000000000";
-	addr_row<="0000000000000";
+	wr_num<=x"0200";
+	ot_bank<="000";
+	ot_addr_col<="0000000000";
+	ot_addr_row<="0000000000000";
+	wr_rqu<='1';
 
 	if rising_edge(clk_self) then
 	
-		if con=0 then
-			wr_rqu<='0';
-			con:=con+1;
-		else
-			if wr_ready='1' then
-				readline(ddr2_data_text,ddr2_data_line); 
-				ram_data_out<=ddr2_data_sim;
-			end if;
+		if wr_ready='1' then
+			readline(ddr2_data_text,ddr2_data_line); 
+			ot_data_out<=ddr2_data_sim;
 		end if;
 
 	end if;
 	file_close(ddr2_data_text);
 
 end process;
+
+with dqs_en select
+	dqs(1) <= dqs_out(1) when '1',
+			  'Z' when others;
+dqs_in(1)<=dqs(1);
+with dqs_en select
+	dqs(0) <= dqs_out(0) when '1',
+			  'Z' when others;
+dqs_in(0)<=dqs(0);
+
+with data_en select
+	data <= data_out when '1',
+					"ZZZZZZZZZZZZZZZZ" when others;
+data_in<=data;
 
 end TESTBEACH;

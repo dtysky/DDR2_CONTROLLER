@@ -337,9 +337,10 @@
     parameter DQ_BITS          =       8; // Number of Data bits
     parameter DQS_BITS         =       1; // Number of Dqs bits
     parameter TRRD             =    7500; // tRRD   Active bank a to Active bank b command time
+//has been changed by dtysky for 1G ram
 `else `define x16
-    parameter ADDR_BITS        =      14; // Address Bits
-    parameter ROW_BITS         =      14; // Number of Address bits
+    parameter ADDR_BITS        =      13; // Address Bits
+    parameter ROW_BITS         =      13; // Number of Address bits
     parameter COL_BITS         =      10; // Number of Column bits
     parameter DM_BITS          =       2; // Number of Data Mask bits
     parameter DQ_BITS          =      16; // Number of Data bits

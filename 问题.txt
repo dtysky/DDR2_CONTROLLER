@@ -1,0 +1,25 @@
+﻿ddr2sim.DDR2M.cmd_task: at time 279994000.0 ps WARNING: 200 us is required before CKE goes active.
+
+不要修改模型里的timescale，用以下命令指定时钟精度
+vsim -t ps work.DDR2SIM 
+
+配合1G 对VH里的TRFC_MIN参数做了修改：
+197500->127500
+
+看不到一些信号，优化问题，此命令表示不优化，也可以在菜单设置：
+vsim -voptargs=+acc -t ps work.DDR2SIM 
+
+vsim -t ps work.DDR2SIM 
+add wave -position end  sim:/ddr2sim/ddr_clk
+add wave -position end  sim:/ddr2sim/ddr_clk_n
+add wave -position end  sim:/ddr2sim/addr
+add wave -position end  sim:/ddr2sim/bank
+add wave -position end  sim:/ddr2sim/DDR2C/cmd
+add wave -position end  sim:/ddr2sim/wr_rqu
+add wave -position end  sim:/ddr2sim/wr_num
+add wave -position end  sim:/ddr2sim/wr_ready
+add wave -position end  sim:/ddr2sim/wr_end
+add wave -position end  sim:/ddr2sim/DDR2M/ba
+add wave -position end  sim:/ddr2sim/DDR2M/addr
+add wave -position end  sim:/ddr2sim/DDR2M/dq
+run 300 us

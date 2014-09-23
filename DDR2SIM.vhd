@@ -229,7 +229,7 @@ begin
 			if wr_ready='1' then
 				readline(ddr2_data_text,ddr2_data_line); 
 				read(ddr2_data_line,ddr2_data_sim);
-				ot_data_out<=ddr2_data_sim;
+				ot_data_in<=ddr2_data_sim;
 			elsif wr_end='1' then
 				wr_rqu<='0';
 			end if;

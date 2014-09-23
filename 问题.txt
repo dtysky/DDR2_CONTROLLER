@@ -22,4 +22,6 @@ add wave -position end  sim:/ddr2sim/wr_end
 add wave -position end  sim:/ddr2sim/DDR2M/ba
 add wave -position end  sim:/ddr2sim/DDR2M/addr
 add wave -position end  sim:/ddr2sim/DDR2M/dq
-run 300 us
+add wave -position end  sim:/ddr2sim/main/ddr2_data_line
+add wave -position end  sim:/ddr2sim/main/ddr2_data_sim
+run 230 us

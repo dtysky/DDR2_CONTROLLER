@@ -43,9 +43,9 @@ generic
 		
 		----------PD FAST,WR=2,CL=3,BT SE,BL=4------------
 		----------------MR with DLL RESET-----------------
-		constant MR1:std_logic_vector(12 downto 0):="0001100011010";
+		constant MR1:std_logic_vector(12 downto 0):="0010100110010";
 		---------------MR without DLL RESET---------------
-		constant MR2:std_logic_vector(12 downto 0):="0001000011010";
+		constant MR2:std_logic_vector(12 downto 0):="0010000110010";
 		
 		--RDQS/DQS# OFF,OCD/DLL ON,ODS FULL,RTT=50,AL=2---
 		---------------EMR with OCD default---------------

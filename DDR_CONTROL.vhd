@@ -1,3 +1,6 @@
+----The wr_num or rd_num must be litter than x"0100"----
+----it means you can only read or write one row form this ram----
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
@@ -62,7 +65,7 @@ port
 		pll_lock:in std_logic;
 		
 		clk_control_p,clk_control_n,clk_control_90,clk_control_270:in std_logic;
-		clk_data_p:in std_logic;
+		clk_data:in std_logic;
 		clk,n_clk:out std_logic;
 		cke,n_cs,n_ras,n_cas,n_we:out std_logic:='1';
 		udm,ldm:out std_logic:='0';
@@ -125,7 +128,7 @@ signal rd_ready_s_1,rd_ready_s_2:std_logic:='0';
 signal wr_rqu_s,rd_rqu_s:std_logic;
 signal udqs_last,udqs_last_last:std_logic:='0';
 signal write_num_s,read_num_s:std_logic_vector(15 downto 0);
-signal dqs_en_s:std_logic;
+signal dqs_en_s:std_logic:='0';
 
 begin
 	
@@ -313,11 +316,11 @@ begin
 						end case;
 					
 					elsif wr_ready_s='1' then
-						wr_ready_s<='0';
 						wr_end<='1';
 						
 						case con_write is
 							when WL =>---WL?未定
+								wr_ready_s<='0';
 								dqs_en_s<='0';
 								dqs_en<='0';
 								ram_data_en<='0';
@@ -327,11 +330,11 @@ begin
 						end case;
 						
 					elsif rd_ready_s='1' then
-						rd_ready_s_1<='0';
 						rd_end<='1';
 						
 						case con_read is
 							when RL =>---RL?未定
+								rd_ready_s_1<='0';
 								dqs_en_s<='0';
 								dqs_en<='0';
 								ram_data_en<='0';
@@ -638,15 +641,15 @@ ram_data_out<=data_other_in;
 data_other_out<=ram_data_in;
 
 
-DQS_FLAG:process(clk_data_p,pll_lock)
+DQS_FLAG:process(clk_data,pll_lock)
 
 begin
 
-	if clk_data_p'event and clk_data_p='1' and pll_lock='1' then
+	if clk_data'event and clk_data='1' and pll_lock='1' then
 		
 		if state=rd then
 			
-			if udqs_in='0' and udqs_last_last='1' then
+			if udqs_in='0' and udqs_last_last/='0' then
 				rd_ready_s_2<='1';
 			else
 				rd_ready_s_2<=rd_ready_s_2;

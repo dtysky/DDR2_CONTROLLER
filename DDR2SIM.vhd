@@ -20,7 +20,7 @@ port
 		pll_lock:in std_logic;
 		
 		clk_control_p,clk_control_n,clk_control_90,clk_control_270:in std_logic;
-		clk_data_p:in std_logic;
+		clk_data:in std_logic;
 		clk,n_clk:out std_logic;
 		cke,n_cs,n_ras,n_cas,n_we:out std_logic:='1';
 		udm,ldm:out std_logic:='0';
@@ -74,7 +74,7 @@ port
 	);
 end component;
 
-signal clk_c_0,clk_c_90,clk_c_180,clk_c_270,clk_d_0,pll_lock:std_logic;
+signal clk_c_0,clk_c_90,clk_c_180,clk_c_270,clk_d_0,clk_d_180,pll_lock:std_logic;
 signal ddr_clk,ddr_clk_n:std_logic;
 signal cke,n_cs,n_ras,n_cas,n_we:std_logic;
 signal dm:std_logic_vector(1 downto 0);
@@ -110,7 +110,7 @@ DDR2C:DDR2_CONTROL
 		(
 			pll_lock=>pll_lock,
 			clk_control_p=>clk_c_0,clk_control_n=>clk_c_180,clk_control_90=>clk_c_90,clk_control_270=>clk_c_270,
-			clk_data_p=>clk_d_0,
+			clk_data=>clk_d_0,
 			clk=>ddr_clk,n_clk=>ddr_clk_n,
 			cke=>cke,n_cs=>n_cs,n_ras=>n_ras,n_cas=>n_cas,n_we=>n_we,
 			udm=>dm(1),ldm=>dm(0),
@@ -195,50 +195,23 @@ end process;
 
 clk_data_0:process
 begin	
-	clk_self<='1';
 	clk_d_0<='1';
+	clk_self<='1';
 	wait for clk_period2/2;
-	clk_self<='0';
 	clk_d_0<='0';
+	clk_self<='0';
+	wait for clk_period2/2;
+end process;
+
+clk_data_180:process
+begin	
+	clk_d_180<='0';
+	wait for clk_period2/2;
+	clk_d_180<='1';
 	wait for clk_period2/2;
 end process;
 
 pll_lock<='1';
-
-main:process
-
-file ddr2_data_text:text;
-variable fst:FILE_OPEN_STATUS; 
-variable ddr2_data_line:line; 
-variable ddr2_data_sim:std_logic_vector(15 downto 0);
-variable con:integer range 0 to 3:=0;
-
-begin
-
-	file_open(fst ,ddr2_data_text ,"textfile.dat",read_mode);
-	while not endfile(ddr2_data_text) loop --判断是否读完文件
-		wait until rising_edge(clk_self); --每个时钟读一行
-		if con=0 then
-			wr_num<=x"0200";
-			ot_bank<="000";
-			ot_addr_col<="0000000000";
-			ot_addr_row<="0000000000000";
-			wr_rqu<='1';
-			con:=con+1;
-		else
-			if wr_ready='1' then
-				readline(ddr2_data_text,ddr2_data_line); 
-				read(ddr2_data_line,ddr2_data_sim);
-				ot_data_in<=ddr2_data_sim;
-			elsif wr_end='1' then
-				wr_rqu<='0';
-			end if;
-		end if;			
-	end loop;
-	file_close(ddr2_data_text);
-
-end process;
-
 with dqs_en select
 	dqs(1) <= dqs_out(1) when '1',
 			  'Z' when others;
@@ -252,5 +225,63 @@ with data_en select
 	data <= data_out when '1',
 					"ZZZZZZZZZZZZZZZZ" when others;
 data_in<=data;
+
+main:process
+
+file ddr2_data_text_w,ddr2_data_text_r:text;
+variable fst:FILE_OPEN_STATUS; 
+variable ddr2_data_line:line; 
+variable ddr2_data_sim:std_logic_vector(15 downto 0);
+variable con:integer range 0 to 7:=0;
+
+begin
+
+	file_open(fst ,ddr2_data_text_r ,"textfile_r.dat",read_mode);
+	file_open(fst ,ddr2_data_text_w ,"textfile_w.dat",write_mode);
+	while (con<4) loop 
+		wait until rising_edge(clk_self); --每个时钟读一行
+		if con=0 then
+			ot_dm<="00";
+			wr_num<=x"0080";
+			ot_bank<="000";
+			ot_addr_col<="0000000000";
+			ot_addr_row<="0000000000000";
+			wr_rqu<='1';
+			con:=con+1;
+		elsif con=1 then
+			if wr_ready='1' then
+				if not endfile(ddr2_data_text_r) then
+					readline(ddr2_data_text_r,ddr2_data_line); 
+					read(ddr2_data_line,ddr2_data_sim);
+					ot_data_in<=ddr2_data_sim;
+				end if;
+			elsif wr_end='1' then
+				wr_rqu<='0';
+				con:=con+1;
+			end if;
+		elsif con=2 then
+			ot_dm<="00";
+			rd_num<=x"0080";
+			ot_bank<="000";
+			ot_addr_col<="0000000000";
+			ot_addr_row<="0000000000000";
+			rd_rqu<='1';
+			con:=con+1;
+		elsif con=3 then
+			if rd_ready='1' then
+				ddr2_data_sim:=ot_data_out;
+				write(ddr2_data_line,ddr2_data_sim);
+				writeline(ddr2_data_text_w,ddr2_data_line); 
+			elsif rd_end='1' then
+				rd_rqu<='0';
+				con:=con+1;
+			end if;
+		end if;			
+	end loop;
+	file_close(ddr2_data_text_r);
+	file_close(ddr2_data_text_w);
+
+end process;
+
 
 end TESTBEACH;

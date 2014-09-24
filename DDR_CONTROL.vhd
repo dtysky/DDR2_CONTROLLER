@@ -1,5 +1,5 @@
-----The wr_num or rd_num must be litter than x"0100"----
-----it means you can only read or write one row form this ram----
+----The wr_num or rd_num must be less than x"0100"----  
+----It means you can only read or write one row form this ram in one operation----  
 
 library ieee;
 use ieee.std_logic_1164.all;

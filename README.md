@@ -1,9 +1,9 @@
 DDR2_CONTROLLER
 ===============
 
-An controller for DDR2 on FPGA with vhdl, content testbeach and model.  
+A controller for DDR2 on FPGA with vhdl, content testbeach and model.  
 ----The wr_num or rd_num must be less than x"0100"----  
-----It means you can only read or write one row form this ram in one operation----  
+----It means Only 1 line would be read/write per operation----  
 
 ddr2_controller----------95%  
 testbeach-------------90%  

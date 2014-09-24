@@ -1,7 +1,7 @@
 --author : dtysky--
 
 ----The wr_num or rd_num must be less than x"0100"----  
-----It means you can only read or write one row form this ram in one operation----  
+----It means Only 1 line would be read/write per operation----  
 
 library ieee;
 use ieee.std_logic_1164.all;

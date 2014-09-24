@@ -1,3 +1,5 @@
+--author : dtysky--
+
 ----The wr_num or rd_num must be less than x"0100"----  
 ----It means you can only read or write one row form this ram in one operation----  
 

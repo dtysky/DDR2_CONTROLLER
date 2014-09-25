@@ -237,7 +237,6 @@ variable con:integer range 0 to 7:=0;
 begin
 
 	file_open(fst ,ddr2_data_text_r ,"textfile_r.dat",read_mode);
-	file_open(fst ,ddr2_data_text_w ,"textfile_w.dat",write_mode);
 	while (con<4) loop 
 		wait until rising_edge(clk_self); --每个时钟读一行
 		if con=0 then
@@ -260,6 +259,7 @@ begin
 				con:=con+1;
 			end if;
 		elsif con=2 then
+			file_open(fst ,ddr2_data_text_w ,"textfile_w.dat",write_mode);
 			ot_dm<="00";
 			rd_num<=x"0080";
 			ot_bank<="000";

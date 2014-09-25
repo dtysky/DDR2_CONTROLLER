@@ -6,5 +6,5 @@ A controller for DDR2 on FPGA with vhdl, content testbeach and model.
 ----It means Only 1 line would be read/write per operation----  
 
 ddr2_controller----------95%  
-testbeach-------------90%  
-sim----------------80%
+testbeach-------------95%  
+sim----------------95%

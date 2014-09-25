@@ -9,7 +9,9 @@ vsim -t ps work.DDR2SIM
 看不到一些信号，优化问题，此命令表示不优化，也可以在菜单设置：
 vsim -voptargs=+acc -t ps work.DDR2SIM 
 
+
 vsim -t ps work.DDR2SIM 
+vsim -voptargs=+acc -t ps work.DDR2SIM 
 add wave -position end  sim:/ddr2sim/ddr_clk
 add wave -position end  sim:/ddr2sim/ddr_clk_n
 add wave -position end  sim:/ddr2sim/addr
@@ -34,4 +36,5 @@ add wave -position end  sim:/ddr2sim/DDR2C/clk_data
 add wave -position end  sim:/ddr2sim/DDR2C/udqs_last
 add wave -position end  sim:/ddr2sim/DDR2C/udqs_last_last
 add wave -position 18  sim:/ddr2sim/dqs_in
+add wave -position 18  sim:/ddr2sim/main/fst
 run -all

@@ -651,7 +651,7 @@ begin
 		
 		if state=rd then
 			
-			if udqs_in='0' and udqs_last_last/='0' then
+			if udqs_last='0' and udqs_last_last/='0' then
 				rd_ready_s_2<='1';
 			else
 				rd_ready_s_2<=rd_ready_s_2;

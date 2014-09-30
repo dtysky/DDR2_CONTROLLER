@@ -12,8 +12,8 @@ ddr2_sim.vhdl----testbeach
 text.py----generating textfile for testing, using random to make result reliablly  
 cmp.py----comparing data writing to ram with data reading from ram  
 textfile_st.dat----testing data(address and bank)  
-textfile_w.dat----testing data writing to ram(data)  
-textfile_r.dat----testing data reading from ram(data)  
+textfile_r.dat----testing data writing to ram(data)  
+textfile_w.dat----testing data reading from ram(data)  
 license----license  
 problem.txt----some problems during sim  
 

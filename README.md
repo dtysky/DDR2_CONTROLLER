@@ -1,7 +1,22 @@
 DDR2_CONTROLLER
 ===============
 
-A controller for DDR2 on FPGA with vhdl, content testbeach and model.  
+A controller for DDR2 on FPGA with vhdl, content testbeach, model and textfile-generation/data-detection using python.  
+  
+file list:  
+
+ddr2_control.vhdl----ddr2 controller  
+ddr2_m.v----ddr2_model(change the mecro 2Gbits model to 1Gbits)  
+ddr2_rarameters.vh----model's head file  
+ddr2_sim.vhdl----testbeach  
+text.py----generating textfile for testing, using random to make result reliable  
+cmp.py----comparing data writing to ram with data reading from ram  
+textfile_st.dat----test data(address bank)  
+textfile_w.dat----test data writing to ram(data)  
+textfile_r.dat----text data reading from ram(data)  
+license----license  
+problem.txt----some problems during sim  
+
 ----The wr_num or rd_num must be less than x"0100"----  
 ----It means Only 1 line would be read/write per operation----  
 

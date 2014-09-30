@@ -280,6 +280,8 @@ begin
 				when arf=>
 					
 					if dqs_en_s='0' then
+						wr_end<='0';
+						rd_end<='0';
 					
 						case con_arf is
 						
@@ -294,7 +296,6 @@ begin
 								if wr_rqu_s='1' then
 									udm<=udm_in;
 									ldm<=ldm_in;
-									wr_end<='0';
 									bank_s<=bank_other;
 									addr_row<=addr_other_row;
 									addr_col<=addr_other_col;
@@ -303,7 +304,6 @@ begin
 								elsif rd_rqu_s='1' then
 									udm<=udm_in;
 									ldm<=ldm_in;
-									rd_end<='0';
 									bank_s<=bank_other;
 									addr_row<=addr_other_row;
 									addr_col<=addr_other_col;
@@ -318,10 +318,10 @@ begin
 						end case;
 					
 					elsif wr_ready_s='1' then
-						wr_end<='1';
 						
 						case con_write is
 							when WL =>---WL?未定
+								wr_end<='1';
 								wr_ready_s<='0';
 								dqs_en_s<='0';
 								dqs_en<='0';
@@ -332,10 +332,10 @@ begin
 						end case;
 						
 					elsif rd_ready_s='1' then
-						rd_end<='1';
 						
 						case con_read is
 							when RL =>---RL?未定
+								rd_end<='1';
 								rd_ready_s_1<='0';
 								dqs_en_s<='0';
 								dqs_en<='0';

@@ -20,6 +20,6 @@ problem.txt----some problems during sim
 ----The wr_num or rd_num must be less than x"0100"----  
 ----It means Only 1 line would be read/write per operation----  
 
-ddr2_controller----------95%  
-testbeach-------------95%  
-sim----------------95%
+ddr2_controller----------100%  
+testbeach-------------100%  
+sim----------------100%

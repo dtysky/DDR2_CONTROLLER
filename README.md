@@ -5,15 +5,15 @@ A controller for DDR2 on FPGA with vhdl, content testbeach, model and textfile-g
   
 file list:  
 
-ddr2_control.vhdl----ddr2 controller  
-ddr2_m.v----ddr2_model(change the mecro 2Gbits model to 1Gbits)  
+ddr_control.vhdl----ddr2 controller  
+ddr2_m.v----ddr2 model(change the mecro 2Gbits model to 1Gbits)  
 ddr2_rarameters.vh----model's head file  
 ddr2_sim.vhdl----testbeach  
-text.py----generating textfile for testing, using random to make result reliable  
+text.py----generating textfile for testing, using random to make result reliablly  
 cmp.py----comparing data writing to ram with data reading from ram  
-textfile_st.dat----test data(address bank)  
-textfile_w.dat----test data writing to ram(data)  
-textfile_r.dat----text data reading from ram(data)  
+textfile_st.dat----testing data(address and bank)  
+textfile_w.dat----testing data writing to ram(data)  
+textfile_r.dat----testing data reading from ram(data)  
 license----license  
 problem.txt----some problems during sim  
 

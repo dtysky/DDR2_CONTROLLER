@@ -1195,7 +1195,7 @@ module ddr2 (
             if (wdqs_cntr > 0) begin
                 wdqs_cntr = wdqs_cntr - 1;
             end
-
+ 
             // write dq
             if (dq_in_valid) begin // write data
                 bit_mask = 0;

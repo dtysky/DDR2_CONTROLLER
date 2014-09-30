@@ -25,16 +25,16 @@ add wave -position end  sim:/ddr2sim/DDR2M/ba
 add wave -position end  sim:/ddr2sim/DDR2M/addr
 add wave -position end  sim:/ddr2sim/DDR2M/dq
 add wave -position end  sim:/ddr2sim/main/ddr2_data_line
+add wave -position end  sim:/ddr2sim/main/ddr2_bank_sim
+add wave -position end  sim:/ddr2sim/main/ddr2_col_sim
+add wave -position end  sim:/ddr2sim/main/ddr2_row_sim
 add wave -position end  sim:/ddr2sim/main/ddr2_data_sim
+add wave -position end  sim:/ddr2sim/main/fstin
+add wave -position end  sim:/ddr2sim/main/fstout
 add wave -position 9  sim:/ddr2sim/rd_rqu
 add wave -position 10  sim:/ddr2sim/rd_num
 add wave -position 11  sim:/ddr2sim/rd_ready
 add wave -position 12  sim:/ddr2sim/rd_end
 add wave -position end  sim:/ddr2sim/DDR2C/state
 add wave -position end  sim:/ddr2sim/main/con
-add wave -position end  sim:/ddr2sim/DDR2C/clk_data
-add wave -position end  sim:/ddr2sim/DDR2C/udqs_last
-add wave -position end  sim:/ddr2sim/DDR2C/udqs_last_last
-add wave -position 18  sim:/ddr2sim/dqs_in
-add wave -position 18  sim:/ddr2sim/main/fst
-run -all
+run 237 us

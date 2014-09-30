@@ -229,37 +229,53 @@ data_in<=data;
 main:process
 
 file ddr2_data_text_w,ddr2_data_text_r:text;
-variable fst:FILE_OPEN_STATUS; 
+variable fstin,fstout:FILE_OPEN_STATUS; 
 variable ddr2_data_line:line; 
 variable ddr2_data_sim:std_logic_vector(15 downto 0);
+variable ddr2_row_sim:std_logic_vector(12 downto 0);
+variable ddr2_col_sim:std_logic_vector(9 downto 0);
+variable ddr2_bank_sim:std_logic_vector(2 downto 0);
 variable con:integer range 0 to 7:=0;
 
 begin
-
-	file_open(fst ,ddr2_data_text_r ,"textfile_r.dat",read_mode);
-	while (con<4) loop 
+	file_open(fstin ,ddr2_data_text_r ,"textfile_r.dat",read_mode);
+	file_open(fstout ,ddr2_data_text_w ,"textfile_w.dat",write_mode);
+	while (con<5) loop 
 		wait until rising_edge(clk_self); --每个时钟读一行
 		if con=0 then
-			ot_dm<="00";
-			wr_num<=x"0080";
-			ot_bank<="000";
-			ot_addr_col<="0000000000";
-			ot_addr_row<="0000000000000";
-			wr_rqu<='1';
-			con:=con+1;
+			if not endfile(ddr2_data_text_r) then
+				ot_dm<="00";
+				wr_num<=x"0080";
+				readline(ddr2_data_text_r,ddr2_data_line); 
+				read(ddr2_data_line,ddr2_bank_sim);
+				ot_bank<=ddr2_bank_sim;
+				readline(ddr2_data_text_r,ddr2_data_line); 
+				read(ddr2_data_line,ddr2_col_sim);
+				ot_addr_col<=ddr2_col_sim;
+				readline(ddr2_data_text_r,ddr2_data_line); 
+				read(ddr2_data_line,ddr2_row_sim);
+				ot_addr_row<=ddr2_row_sim;
+				wr_rqu<='1';
+				con:=con+1;
+			else
+				con:=5;
+			end if;
 		elsif con=1 then
 			if wr_ready='1' then
-				if not endfile(ddr2_data_text_r) then
-					readline(ddr2_data_text_r,ddr2_data_line); 
-					read(ddr2_data_line,ddr2_data_sim);
+				readline(ddr2_data_text_r,ddr2_data_line); 
+				read(ddr2_data_line,ddr2_data_sim);
+				if ddr2_data_sim=x"FFFF" then
+					con:=con+1;
+				else
 					ot_data_in<=ddr2_data_sim;
 				end if;
-			elsif wr_end='1' then
+			end if;
+		elsif con=2 then
+			if wr_end='1' then
 				wr_rqu<='0';
 				con:=con+1;
 			end if;
-		elsif con=2 then
-			file_open(fst ,ddr2_data_text_w ,"textfile_w.dat",write_mode);
+		elsif con=3 then
 			ot_dm<="00";
 			rd_num<=x"0080";
 			ot_bank<="000";
@@ -267,19 +283,21 @@ begin
 			ot_addr_row<="0000000000000";
 			rd_rqu<='1';
 			con:=con+1;
-		elsif con=3 then
+		elsif con=4 then
 			if rd_ready='1' then
 				ddr2_data_sim:=ot_data_out;
 				write(ddr2_data_line,ddr2_data_sim);
 				writeline(ddr2_data_text_w,ddr2_data_line); 
 			elsif rd_end='1' then
 				rd_rqu<='0';
-				con:=con+1;
+				con:=0;
 			end if;
 		end if;			
 	end loop;
 	file_close(ddr2_data_text_r);
 	file_close(ddr2_data_text_w);
+	wait;
+
 
 end process;
 

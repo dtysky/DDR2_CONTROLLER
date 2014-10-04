@@ -12,7 +12,7 @@ entity DDR2SIM is
 
 end entity;
 
-architecture TESTBEACH of DDR2SIM is
+architecture TESTBENCH of DDR2SIM is
 
 component DDR2_CONTROL is
 port
@@ -322,4 +322,4 @@ begin
 end process;
 
 
-end TESTBEACH;
+end TESTBENCH;

@@ -241,7 +241,7 @@ begin
 	file_open(fstst ,ddr2_data_text_st ,"textfile_st.dat",read_mode);
 	file_open(fstin ,ddr2_data_text_r ,"textfile_r.dat",read_mode);
 	file_open(fstout ,ddr2_data_text_w ,"textfile_w.dat",write_mode);
-	while (con<5) loop 
+	while (con<6) loop 
 		wait until rising_edge(clk_self); --每个时钟读一行
 		--------write--------
 		if con=0 then
@@ -296,9 +296,16 @@ begin
 				rd_rqu<='1';
 				con:=con+1;
 			else
-				con:=5;
+				con:=6;
 			end if;
 		elsif con=4 then
+			if rd_ready='1' then
+				ddr2_data_sim:=ot_data_out;
+				write(ddr2_data_line,ddr2_data_sim);
+				writeline(ddr2_data_text_w,ddr2_data_line); 
+				con:=5;
+			end if;
+		elsif con=5 then
 			if rd_ready='1' then
 				ddr2_data_sim:=ot_data_out;
 				if ddr2_data_sim="ZZZZZZZZZZZZZZZZ" or ddr2_data_sim="XXXXXXXXXXXXXXXX" then

@@ -66,7 +66,7 @@ port
 	(
 		pll_lock:in std_logic;
 		
-		clk_control_p,clk_control_n,clk_control_90,clk_control_270:in std_logic;
+		clk_control_p,clk_control_n,clk_out_p,clk_out_n:in std_logic;
 		clk_data:in std_logic;
 		clk,n_clk:out std_logic;
 		cke,n_cs,n_ras,n_cas,n_we:out std_logic:='1';
@@ -134,8 +134,8 @@ signal dqs_en_s:std_logic:='0';
 
 begin
 	
-	clk<=clk_control_270;
-	n_clk<=clk_control_90;
+	clk<=clk_out_p;
+	n_clk<=clk_out_n;
 	
 	cke<=cmd(4);
 	n_cs<=cmd(3);

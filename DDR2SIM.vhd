@@ -19,7 +19,7 @@ port
 	(
 		pll_lock:in std_logic;
 		
-		clk_control_p,clk_control_n,clk_control_90,clk_control_270:in std_logic;
+		clk_control_p,clk_control_n,clk_out_p,clk_out_n:in std_logic;
 		clk_data:in std_logic;
 		clk,n_clk:out std_logic;
 		cke,n_cs,n_ras,n_cas,n_we:out std_logic:='1';
@@ -109,7 +109,7 @@ DDR2C:DDR2_CONTROL
 	port map
 		(
 			pll_lock=>pll_lock,
-			clk_control_p=>clk_c_0,clk_control_n=>clk_c_180,clk_control_90=>clk_c_90,clk_control_270=>clk_c_270,
+			clk_control_p=>clk_c_0,clk_control_n=>clk_c_180,clk_out_p=>clk_c_0,clk_out_n=>clk_c_180,
 			clk_data=>clk_d_0,
 			clk=>ddr_clk,n_clk=>ddr_clk_n,
 			cke=>cke,n_cs=>n_cs,n_ras=>n_ras,n_cas=>n_cas,n_we=>n_we,

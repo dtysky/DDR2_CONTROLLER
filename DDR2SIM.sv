@@ -46,8 +46,8 @@ module  DDR2SIM();
 				r_addr_col.push_back(addr_col);
 		endfunction : write_creat
 
-		function bit[15:0] data_write();
-			return data.pop_front();
+		function bit[15:0] write(integer i);
+			return data[i];
 		endfunction : data_write
 
 		function void read_creat();
@@ -125,6 +125,7 @@ module  DDR2SIM();
 
 	//Init
 	initial begin
+		pll_lock=1;
 		clk_c_0=0;
 		clk_c_180 = 1;
 		clk_o_0=0;
@@ -145,6 +146,19 @@ module  DDR2SIM();
 
 	end
 
+	//Combinational logic
+	always_comb begin
+		if (dqs_en)
+			dqs=dqs_out;
+		else
+			dqs=2'bz;
+		dqs_in=dqs;
+		if (data_en)
+			data=data_out;
+		else
+			data=16'bz;
+		data_in=data;
+	end
 
 endmodule
 

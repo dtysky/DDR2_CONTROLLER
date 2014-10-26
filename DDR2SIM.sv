@@ -1,4 +1,4 @@
-module  DDR2SIM();
+module  ddr2sim();
 
 	//Parameter
 	timeunit 1ps;
@@ -7,8 +7,6 @@ module  DDR2SIM();
 	parameter Ram_addr_row_l=13;
 	parameter Ram_addr_col_l=10;
 	parameter Ram_data_l=16;
-	parameter CycleC = 6000;
-	parameter CycleD = 3000;
 
 	//Class
 	class ram_class;
@@ -46,7 +44,7 @@ module  DDR2SIM();
 				r_addr_col.push_back(addr_col);
 		endfunction : write_creat
 
-		function bit[15:0] write(integer i);
+		function bit[15:0] data_write(integer i);
 			return data[i];
 		endfunction : data_write
 
@@ -76,15 +74,15 @@ module  DDR2SIM();
 	bit clk_c_0,clk_c_180,clk_o_0,clk_o_180,clk_d_0,clk_d_180,pll_lock;
 	bit ddr2_clk,ddr2_clk_n;
 	bit cke,n_cs,n_ras,n_cas,n_we;
-	bit[1:0] dm;
+	wire[1:0] dm;
 	bit[1:0] dqs_in,dqs_out;
-	logic[1:0] dqs;
+	wire[1:0] dqs;
 	bit dqs_en;
 	bit odt;
 	bit[2:0] bank;
 	bit[12:0] addr;
 	bit[15:0] data_in,data_out;
-	logic[15:0] data;
+	wire[15:0] data;
 	bit data_en;
 	bit ram_reset;
 	bit wr_rqu,rd_rqu;
@@ -96,12 +94,19 @@ module  DDR2SIM();
 	bit[2:0] ot_bank;
 	bit[12:0] ot_addr_row;
 	bit[9:0] ot_addr_col;
-	bit[1:0] dqs_n,rdqs_n;
+	wire[1:0] dqs_n,rdqs_n;
 	//Class
 	ram_class ram_c;
 
 	//Instantiation
-	DDR2_CONTROL ddr2_c(
+	CLOCK clk(
+		clk_c_0,clk_c_180,
+		clk_o_0,clk_o_180,
+		clk_d_0,clk_d_180,
+		pll_lock
+		);
+
+	DDR2_CONTROL DDR2C(
 		pll_lock,clk_c_0,clk_c_180,clk_o_0,clk_o_180,clk_d_0,
 		ddr2_clk,ddr2_clk_n,cke,n_cs,n_ras,n_cas,n_we,
 		dm[1],dm[0],
@@ -114,7 +119,7 @@ module  DDR2SIM();
 		ot_data_in,ot_data_out,ot_bank,ot_addr_row,ot_addr_col
 		);
 
-	DDR2 ddr2_m(
+	ddr2 DDR2M(
 		ddr2_clk,ddr2_clk_n,
 		cke,n_cs,n_ras,n_cas,n_we,
 		dm,
@@ -123,42 +128,58 @@ module  DDR2SIM();
 		odt
 		);
 
+	//Wire
+	assign dqs=dqs_en?(dqs_out):2'bz;
+	assign data=data_en?(data_out):16'bz;
+	assign dqs_in=dqs;
+	assign data_in=data;
+
+	//Task
+	task write();
+		@(posedge clk_d_180);
+		ram_c.write_creat();
+		ot_dm=2'b0;
+		wr_num=ram_c.nums;
+		ot_bank=ram_c.bank;
+		ot_addr_row=ram_c.addr_row;
+		ot_addr_col=ram_c.addr_col;
+		wr_rqu=1;
+		while(!wr_ready) @(posedge clk_d_180);
+		for(int i=0;i<ram_c.nums*4;i++) @(posedge clk_d_180)
+			ot_data_in=ram_c.data_write(i);
+		while(!wr_end) @(posedge clk_d_180);
+		wr_rqu=0;
+		return;
+	
+	endtask : write
+
+	task read();
+		@(posedge clk_d_180);
+		ram_c.read_creat();
+		wr_num=ram_c.nums;
+		ot_bank=ram_c.bank;
+		ot_addr_row=ram_c.addr_row;
+		ot_addr_col=ram_c.addr_col;
+		rd_rqu=1;
+		while(!rd_ready) @(posedge clk_d_180);
+		repeat(ram_c.nums*4) @(posedge clk_d_180)
+			ram_c.data_read(ot_data_out);
+		while(!rd_end) @(posedge clk_d_180);
+		rd_rqu=0;
+		return;
+	endtask : read
+
 	//Init
 	initial begin
-		pll_lock=1;
-		clk_c_0=0;
-		clk_c_180 = 1;
-		clk_o_0=0;
-		clk_o_180 = 1;
-		clk_d_0=0;
-		clk_d_180 = 1;
-		ram_c = new();
-		forever # (CycleC/2) begin
-			clk_c_0=~clk_c_0;
-			clk_c_180=~clk_c_180;
-			clk_o_0=~clk_o_0;
-			clk_o_180=~clk_o_180;
+		ram_c=new();
+		repeat(100)
+			write();
+		repeat(100) begin
+			read();
+			ram_c.check();
 		end
-		forever # (CycleD) begin
-			clk_d_0=~clk_d_0;
-			clk_d_180=~clk_d_180;
-		end
-
 	end
 
-	//Combinational logic
-	always_comb begin
-		if (dqs_en)
-			dqs=dqs_out;
-		else
-			dqs=2'bz;
-		dqs_in=dqs;
-		if (data_en)
-			data=data_out;
-		else
-			data=16'bz;
-		data_in=data;
-	end
 
 endmodule
 

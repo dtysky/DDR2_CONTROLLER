@@ -145,7 +145,8 @@ module  ddr2sim();
 		ot_addr_col=ram_c.addr_col;
 		wr_rqu=1;
 		while(!wr_ready) @(posedge clk_d_180);
-		for(int i=0;i<ram_c.nums*4;i++) @(posedge clk_d_180)
+		ot_data_in=ram_c.data_write(0);
+		for(int i=1;i<ram_c.nums*4;i++) @(posedge clk_d_180)
 			ot_data_in=ram_c.data_write(i);
 		while(!wr_end) @(posedge clk_d_180);
 		wr_rqu=0;
@@ -162,7 +163,8 @@ module  ddr2sim();
 		ot_addr_col=ram_c.addr_col;
 		rd_rqu=1;
 		while(!rd_ready) @(posedge clk_d_180);
-		repeat(ram_c.nums*4) @(posedge clk_d_180)
+		ram_c.data_read(ot_data_out);
+		repeat(ram_c.nums*4-1) @(posedge clk_d_180)
 			ram_c.data_read(ot_data_out);
 		while(!rd_end) @(posedge clk_d_180);
 		rd_rqu=0;
